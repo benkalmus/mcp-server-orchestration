@@ -1,0 +1,31 @@
+services:
+  # Paper Search MCP
+  paper-search-mcpo:
+    build:
+      context: ./paper-search
+      dockerfile: Dockerfile
+    container_name: paper-search-mcpo
+    profiles:
+      - paper-search
+      - all
+    ports:
+      - "8765:8765"
+    volumes:
+      - paper-search-data:/app/paper-search-mcp/downloads
+    networks:
+      - shared-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/openapi.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  paper-search-data:
+    driver: local
+
+networks:
+  shared-network:
+    external: true
