@@ -1,15 +1,15 @@
 FROM python:3.13-slim
 
-# Install uv and git
-RUN apt-get update && apt-get install -y curl git && rm -rf /var/lib/apt/lists/*
+# Install uv
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:${PATH}"
 
 # Set working directory
 WORKDIR /app
 
-# Clone paper-search-mcp into the container
-RUN git clone https://github.com/openags/paper-search-mcp.git /app/paper-search-mcp
+# Copy paper-search-mcp from git submodule
+COPY paper-search-mcp /app/paper-search-mcp
 
 # Install dependencies
 RUN cd /app/paper-search-mcp && uv sync
