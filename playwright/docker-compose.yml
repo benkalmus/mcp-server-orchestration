@@ -11,7 +11,8 @@ services:
       "--config", "/app/config.json",
       "--init-script", "/app/stealth-init.js",
       "--allowed-hosts", "*",
-      "--shared-browser-context"
+      "--shared-browser-context",
+      "--snapshot-mode", "none"
     ]
     networks:
       - shared-network
