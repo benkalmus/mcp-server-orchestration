@@ -1,0 +1,53 @@
+ARG PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+# ------------------------------
+# Builder (bun for install + compile TS)
+# ------------------------------
+FROM oven/bun:1 AS builder
+
+WORKDIR /app
+
+COPY fast-playwright-mcp/ /app/
+
+RUN bun install --frozen-lockfile && \
+  bun run build
+
+# ------------------------------
+# Browser (install chromium binary)
+# ------------------------------
+FROM node:22-bookworm-slim AS browser
+
+ARG PLAYWRIGHT_BROWSERS_PATH
+ENV PLAYWRIGHT_BROWSERS_PATH=${PLAYWRIGHT_BROWSERS_PATH}
+
+COPY --from=builder /app/node_modules/playwright-core /tmp/playwright-core
+RUN node /tmp/playwright-core/cli.js install --no-shell chromium
+
+# ------------------------------
+# Runtime
+# ------------------------------
+FROM node:22-bookworm-slim
+
+ARG PLAYWRIGHT_BROWSERS_PATH
+ARG USERNAME=node
+ENV PLAYWRIGHT_BROWSERS_PATH=${PLAYWRIGHT_BROWSERS_PATH}
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+COPY --from=builder /app/lib/ /app/lib/
+COPY --from=builder /app/cli.js /app/cli.js
+COPY --from=builder /app/package.json /app/package.json
+COPY --from=builder /app/node_modules/ /app/node_modules/
+
+RUN npx -y playwright-core install-deps chromium
+
+COPY --from=browser --chown=${USERNAME}:${USERNAME} ${PLAYWRIGHT_BROWSERS_PATH} ${PLAYWRIGHT_BROWSERS_PATH}
+
+RUN chown -R ${USERNAME}:${USERNAME} /app
+
+USER ${USERNAME}
+
+WORKDIR /home/${USERNAME}
+
+ENTRYPOINT ["node", "/app/cli.js", "--headless", "--browser", "chromium", "--no-sandbox"]

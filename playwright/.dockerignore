@@ -1,0 +1,10 @@
+fast-playwright-mcp/.git
+fast-playwright-mcp/node_modules
+fast-playwright-mcp/.github
+fast-playwright-mcp/test-results
+fast-playwright-mcp/tests
+fast-playwright-mcp/benchmark
+fast-playwright-mcp/*.md
+fast-playwright-mcp/CLAUDE.md
+fast-playwright-mcp/LICENSE
+playwright-mcp-ultra/
