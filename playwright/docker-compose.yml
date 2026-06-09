@@ -2,7 +2,7 @@ services:
   playwright-mcp:
     image: mcr.microsoft.com/playwright/mcp
     container_name: playwright-mcp
-    command: ["--port", "8931", "--host", "0.0.0.0", "--allowed-hosts", "*", "--browser", "firefox"]
+    command: ["--port", "8931", "--host", "0.0.0.0", "--allowed-hosts", "*"]
     networks:
       - shared-network
     restart: unless-stopped
@@ -15,6 +15,8 @@ services:
   playwright-mcpo:
     image: ghcr.io/open-webui/mcpo:main
     container_name: playwright-mcpo
+    depends_on:
+      - playwright-mcp
     volumes:
       - ./mcpo-config.json:/app/config.json:ro
     ports:
