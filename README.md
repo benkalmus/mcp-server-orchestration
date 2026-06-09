@@ -6,10 +6,13 @@ Centralized Docker-based MCP (Model Context Protocol) servers for multi-client a
 
 ```
 mcp-servers/
-├── docker-compose.yml        ← Global orchestration
+├── docker-compose.yml        ← Global orchestration (paper-search)
 ├── paper-search/             ← Paper search MCP tool
 │   ├── Dockerfile
 │   └── start.sh
+├── playwright/               ← Browser automation MCP tool
+│   ├── docker-compose.yml
+│   └── mcpo-config.json
 └── (future-tools)/           ← Add new MCPs here
     ├── Dockerfile
     └── start.sh
@@ -73,6 +76,35 @@ http://paper-search-mcpo:8765
 **Usage from host**:
 ```bash
 curl http://localhost:8765/openapi.json
+```
+
+### Playwright Browser Automation (`playwright-mcpo`)
+
+Headless Firefox browser automation via Playwright MCP. Navigate websites, fill forms, click elements, extract data from JS-heavy pages.
+
+- **Internal port**: 8765 (mcpo proxy)
+- **Host port**: 8767
+- **API Docs**: `http://localhost:8767/playwright/openapi.json`
+- **Network name**: `playwright-mcpo` (within Docker network)
+
+**Start**:
+```bash
+cd playwright && docker compose up -d --pull always
+```
+
+**Update to latest Playwright MCP image**:
+```bash
+cd playwright && docker compose up -d --pull always
+```
+
+**Usage from OpenWebUI (on shared network)**:
+```
+http://playwright-mcpo:8765/playwright
+```
+
+**Usage from host**:
+```bash
+curl http://localhost:8767/playwright/openapi.json
 ```
 
 ## Adding a New MCP Tool
@@ -139,15 +171,26 @@ docker ps
 
 ## Architecture
 
+**Paper Search** (built-in mcpo):
 ```
-MCP Server (in container)
-         ↓
-      mcpo (HTTP wrapper)
-         ↓
-    HTTP API (port 8765)
-         ↓
-    shared-network
-         ↓
-┌────────┴────────┬──────────┐
-OpenWebUI    OpenCode    Claude Code
+MCP Server (uv run)
+      ↓
+   mcpo (HTTP wrapper, same container)
+      ↓
+  HTTP API (port 8765)
+      ↓
+  shared-network
 ```
+
+**Playwright** (separate containers):
+```
+mcr.microsoft.com/playwright/mcp (official image, port 8931)
+      ↓
+   mcpo proxy (separate container)
+      ↓
+  HTTP API (port 8765)
+      ↓
+  shared-network
+```
+
+Both patterns expose OpenAPI endpoints consumable by OpenWebUI, OpenCode, Claude Code, etc.
