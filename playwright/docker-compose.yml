@@ -2,7 +2,16 @@ services:
   playwright-mcp:
     image: mcr.microsoft.com/playwright/mcp
     container_name: playwright-mcp
-    command: ["--port", "8931", "--host", "0.0.0.0", "--allowed-hosts", "*"]
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - ./stealth-init.js:/app/stealth-init.js:ro
+    ports:
+      - "8931:8931"
+    command: [
+      "--config", "/app/config.json",
+      "--init-script", "/app/stealth-init.js",
+      "--allowed-hosts", "*"
+    ]
     networks:
       - shared-network
     restart: unless-stopped

@@ -1,0 +1,24 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "launchOptions": {
+      "headless": true,
+      "args": ["--no-sandbox", "--disable-blink-features=AutomationControlled"]
+    },
+    "contextOptions": {
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15",
+      "locale": "en-GB",
+      "timezoneId": "Europe/London"
+    }
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8931
+  },
+  "outputDir": "/tmp/playwright-output",
+  "imageResponses": "omit"
+}
