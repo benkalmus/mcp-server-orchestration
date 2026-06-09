@@ -10,7 +10,8 @@ services:
     command: [
       "--config", "/app/config.json",
       "--init-script", "/app/stealth-init.js",
-      "--allowed-hosts", "*"
+      "--allowed-hosts", "*",
+      "--shared-browser-context"
     ]
     networks:
       - shared-network
