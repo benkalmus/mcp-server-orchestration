@@ -80,7 +80,9 @@ curl http://localhost:8765/openapi.json
 
 ### Playwright Browser Automation (`playwright-mcpo`)
 
-Headless Firefox browser automation via Playwright MCP. Navigate websites, fill forms, click elements, extract data from JS-heavy pages.
+Headless Chromium browser automation via Playwright MCP. Navigate websites, fill forms, click elements, extract data from JS-heavy pages.
+
+> **Note**: The official Docker image only bundles Chromium. Firefox/WebKit require a custom image.
 
 - **Internal port**: 8765 (mcpo proxy)
 - **Host port**: 8767
