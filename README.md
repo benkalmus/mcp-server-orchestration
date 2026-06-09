@@ -80,12 +80,20 @@ curl http://localhost:8765/openapi.json
 
 ### Playwright Browser Automation (`playwright-mcpo`)
 
-Headless Chromium browser automation via Playwright MCP. Navigate websites, fill forms, click elements, extract data from JS-heavy pages.
+Headless Chromium browser automation via Playwright MCP with anti-detection stealth patches. Navigate websites, fill forms, click elements, extract data from JS-heavy pages.
 
 > **Note**: The official Docker image only bundles Chromium. Firefox/WebKit require a custom image.
 
+**Stealth config** (`stealth-init.js`):
+- Hides `navigator.webdriver` flag
+- Overrides WebGL vendor/renderer (Intel Iris on Mac)
+- Sets `navigator.platform` to `MacIntel`
+- Patches `HeadlessChrome` in user agent string
+- Emulates Mac Safari user agent with `en-GB` locale
+
 - **Internal port**: 8765 (mcpo proxy)
 - **Host port**: 8767
+- **Playwright MCP port**: 8931 (direct, for OpenCode)
 - **API Docs**: `http://localhost:8767/playwright/openapi.json`
 - **Network name**: `playwright-mcpo` (within Docker network)
 
