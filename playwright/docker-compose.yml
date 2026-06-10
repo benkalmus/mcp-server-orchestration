@@ -1,18 +1,23 @@
 services:
   playwright-mcp:
-    image: mcr.microsoft.com/playwright/mcp
+    build:
+      context: .
+      dockerfile: Dockerfile.tontoko
     container_name: playwright-mcp
     volumes:
       - ./config.json:/app/config.json:ro
-      - ./stealth-init.js:/app/stealth-init.js:ro
     ports:
       - "8931:8931"
+    environment:
+      - CLEANUP_TIMEOUT_MINUTES=20
+      - CLEANUP_CHECK_INTERVAL=60
     command: [
+      "node", "/app/cli.js",
       "--config", "/app/config.json",
-      "--init-script", "/app/stealth-init.js",
-      "--allowed-hosts", "*",
-      "--shared-browser-context",
-      "--snapshot-mode", "none"
+      "--headless",
+      "--browser", "chromium",
+      "--no-sandbox",
+      "--isolated"
     ]
     networks:
       - shared-network
@@ -22,31 +27,6 @@ services:
         limits:
           cpus: "2.0"
           memory: 2G
-
-  playwright-mcpo:
-    image: ghcr.io/open-webui/mcpo:main
-    container_name: playwright-mcpo
-    depends_on:
-      - playwright-mcp
-    volumes:
-      - ./mcpo-config.json:/app/config.json:ro
-    ports:
-      - "8767:8765"
-    networks:
-      - shared-network
-    command: ["--config", "/app/config.json", "--host", "0.0.0.0", "--port", "8765"]
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8765/openapi.json"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
 
 networks:
   shared-network:
