@@ -284,6 +284,30 @@ If the version changed (after `npx playwright install chromium`), update the pat
 - 8932: browser-auth (systemd)
 - 9222: Chromium CDP (systemd)
 - 8765: paper-search (Docker)
+- 8767: playwright-mcpo (Docker, proxies browser-auth for OpenWebUI)
+
+## Resource Usage
+
+| Component | RAM idle | RAM under load | CPU idle | CPU under load |
+|-----------|----------|----------------|----------|----------------|
+| browser-lite (Docker) | ~100MB | ~300MB | ~0% | ~5% |
+| browser-auth Chromium (CDP) | ~500MB | up to 1.8GB | ~0.5% | ~7% |
+| browser-auth MCP (node) | ~75MB | ~75MB | ~0% | ~0% |
+| playwright-mcpo (mcpo proxy) | ~68MB | ~68MB | ~0.3% | ~0.3% |
+| **Total** | **~750MB** | **~2.2GB** | **~1%** | **~12%** |
+
+The auth Chromium is the biggest resource consumer. Facebook tabs are particularly heavy (~700MB per renderer tab). Idle overhead is modest at ~750MB.
+
+## OpenWebUI Integration
+
+OpenWebUI connects to browser MCPs using two different methods:
+
+- **browser-lite**: Native MCP Streamable HTTP at `http://playwright-mcp:8931/mcp` (container name, same Docker network)
+- **browser-auth**: mcpo OpenAPI proxy at `http://playwright-mcpo:8765/browser-auth/openapi.json` (container exposes OpenAPI, translates to MCP on host)
+
+browser-lite works directly because OpenWebUI's built-in MCP client supports Streamable HTTP. browser-auth needs mcpo as a translation layer because the host-based MCP server is not reachable by container name.
+
+The mcpo container uses `extra_hosts: host.docker.internal:host-gateway` to reach the host MCP on port 8932.
 
 ## Key Files
 
@@ -292,7 +316,7 @@ If the version changed (after `npx playwright install chromium`), update the pat
 | `playwright/chromium-cdp.service` | Systemd service: persistent headless Chromium with CDP on port 9222 |
 | `playwright/playwright-mcp-auth.service` | Systemd service: MCP auth server on port 8932, connects to CDP |
 | `playwright/sync-browser-auth` | Shell script: rsyncs snap Chromium session to auth profile |
-| `playwright/docker-compose.yml` | Docker: tontoko fork on port 8931 |
+| `playwright/docker-compose.yml` | Docker: tontoko fork on port 8931 + mcpo proxy on port 8767 |
 | `playwright/Dockerfile.tontoko` | Builds tontoko/fast-playwright-mcp from source with bun |
 | `playwright/config.json` | Browser config: stealth args, viewport, locale, user agent |
 | `playwright/stealth-init.js` | JS stealth patches evaluated before page scripts |
