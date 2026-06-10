@@ -1,0 +1,6 @@
+[Unit]
+Description=Restart chromium-cdp service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl --user restart chromium-cdp.service

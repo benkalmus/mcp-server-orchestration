@@ -105,14 +105,18 @@ Connects to a persistent headless Chromium via CDP that shares your logged-in se
 #### Step 1: Install systemd services
 
 ```bash
-# Copy service files
+# Copy service and timer files
 cp mcp-servers/playwright/chromium-cdp.service ~/.config/systemd/user/
+cp mcp-servers/playwright/chromium-cdp-restart.service ~/.config/systemd/user/
+cp mcp-servers/playwright/chromium-cdp-restart.timer ~/.config/systemd/user/
 cp mcp-servers/playwright/playwright-mcp-auth.service ~/.config/systemd/user/
 
 # Reload and enable
 systemctl --user daemon-reload
 systemctl --user enable chromium-cdp.service playwright-mcp-auth.service
+systemctl --user enable chromium-cdp-restart.timer
 systemctl --user start chromium-cdp.service
+systemctl --user start chromium-cdp-restart.timer
 # playwright-mcp-auth has BindsTo=chromium-cdp, so it starts after
 systemctl --user start playwright-mcp-auth.service
 ```
@@ -314,6 +318,8 @@ The mcpo container uses `extra_hosts: host.docker.internal:host-gateway` to reac
 | File | Purpose |
 |------|---------|
 | `playwright/chromium-cdp.service` | Systemd service: persistent headless Chromium with CDP on port 9222 |
+| `playwright/chromium-cdp-restart.timer` | Systemd timer: daily 3AM restart to reclaim memory |
+| `playwright/chromium-cdp-restart.service` | Systemd oneshot: triggered by timer, restarts chromium-cdp |
 | `playwright/playwright-mcp-auth.service` | Systemd service: MCP auth server on port 8932, connects to CDP |
 | `playwright/sync-browser-auth` | Shell script: rsyncs snap Chromium session to auth profile |
 | `playwright/docker-compose.yml` | Docker: tontoko fork on port 8931 + mcpo proxy on port 8767 |
