@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "playwright": {
+    "browser-auth": {
       "type": "streamable-http",
-      "url": "http://playwright-mcp:8931/mcp"
+      "url": "http://host.docker.internal:8932/mcp"
     }
   }
 }

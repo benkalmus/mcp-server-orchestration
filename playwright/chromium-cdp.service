@@ -1,0 +1,12 @@
+[Unit]
+Description=Persistent headless Chromium with CDP for authenticated browsing
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/benkalmus/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome --remote-debugging-port=9222 --user-data-dir=/home/benkalmus/.config/chromium-auth --no-first-run --no-sandbox --headless=new --disable-gpu
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

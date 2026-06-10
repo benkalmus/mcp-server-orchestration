@@ -1,0 +1,28 @@
+#!/bin/bash
+# Sync session data from snap Chromium to the auth headless Chromium profile
+# Run this after logging into sites in your normal browser
+# Usage: sync-browser-auth
+
+SNAP_PROFILE="$HOME/snap/chromium/common/chromium/Default"
+AUTH_PROFILE="$HOME/.config/chromium-auth/Default"
+
+if [ ! -d "$SNAP_PROFILE" ]; then
+  echo "ERROR: Snap Chromium profile not found at $SNAP_PROFILE"
+  exit 1
+fi
+
+mkdir -p "$AUTH_PROFILE"
+
+rsync -a --delete \
+  --exclude SingletonLock \
+  --exclude SingletonCookie \
+  --exclude SingletonSocket \
+  --exclude 'Cache/' \
+  --exclude 'Code Cache/' \
+  --exclude 'GPUCache/' \
+  --exclude 'Service Worker/CacheStorage/' \
+  --exclude 'blob_storage/' \
+  "$SNAP_PROFILE/" "$AUTH_PROFILE/"
+
+echo "Session data synced. Restart chromium-cdp service to pick up changes:"
+echo "  systemctl --user restart chromium-cdp.service"

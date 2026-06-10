@@ -1,0 +1,14 @@
+[Unit]
+Description=Playwright MCP auth server (CDP to persistent Chromium)
+After=chromium-cdp.service
+BindsTo=chromium-cdp.service
+
+[Service]
+Type=simple
+ExecStart=npx -y @playwright/mcp@latest --cdp-endpoint=http://127.0.0.1:9222 --port 8932 --host 0.0.0.0 --allowed-hosts '*'
+Restart=on-failure
+RestartSec=5
+Environment=NODE_OPTIONS=--dns-result-order=ipv4first
+
+[Install]
+WantedBy=default.target
