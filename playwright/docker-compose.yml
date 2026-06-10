@@ -10,7 +10,7 @@ services:
       - "8931:8931"
     environment:
       - CLEANUP_TIMEOUT_MINUTES=20
-      - CLEANUP_CHECK_INTERVAL=60
+      - CLEANUP_CHECK_INTERVAL=120
     command: [
       "node", "/app/cli.js",
       "--config", "/app/config.json",
