@@ -1,6 +1,7 @@
 [Unit]
-Description=Restart chromium-cdp service
+Description=Restart chromium-cdp service (clean session)
 
 [Service]
 Type=oneshot
+ExecStart=/bin/bash -c 'rm -f /home/benkalmus/.config/chromium-auth/Default/Current\ Session /home/benkalmus/.config/chromium-auth/Default/Current\ Tabs /home/benkalmus/.config/chromium-auth/Default/Last\ Session /home/benkalmus/.config/chromium-auth/Default/Last\ Tabs'
 ExecStart=/usr/bin/systemctl --user restart chromium-cdp.service
