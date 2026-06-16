@@ -1,0 +1,28 @@
+#!/bin/bash
+# Start browser-auth Chromium, sync session, navigate to URL
+# Usage: browser-auth-start [url]
+# Default: Facebook Marketplace UK
+
+URL="${1:-https://www.facebook.com/marketplace/}"
+
+# Sync latest session from snap Chromium
+sync-browser-auth
+
+# Enable and start services
+systemctl --user enable chromium-cdp.service playwright-mcp-auth.service >/dev/null 2>&1
+systemctl --user start chromium-cdp.service
+
+# Wait for CDP to be ready
+for i in $(seq 1 10); do
+  if curl -s http://127.0.0.1:9222/json/version >/dev/null 2>&1; then
+    break
+  fi
+  sleep 1
+done
+
+systemctl --user start playwright-mcp-auth.service
+
+# Navigate to URL via CDP
+curl -s "http://127.0.0.1:9222/json/new?${URL}" >/dev/null
+
+echo "browser-auth ready on :8932 — ${URL}"

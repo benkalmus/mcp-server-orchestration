@@ -1,0 +1,8 @@
+#!/bin/bash
+# Stop browser-auth Chromium and disable services
+# Usage: browser-auth-stop
+
+systemctl --user stop playwright-mcp-auth.service chromium-cdp.service chromium-cdp-restart.timer 2>/dev/null
+systemctl --user disable chromium-cdp.service playwright-mcp-auth.service chromium-cdp-restart.timer 2>/dev/null
+
+echo "browser-auth stopped and disabled"
