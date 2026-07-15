@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=simple
 ExecStart=/home/benkalmus/.cache/ms-playwright/chromium-1223/chrome-linux64/chrome --remote-debugging-port=9222 --user-data-dir=/home/benkalmus/.config/chromium-auth --no-first-run --no-sandbox --headless=new --disable-gpu
+ExecStartPost=/bin/bash -c 'sleep 30 && while true; do sleep 300; if ! ss -tnp | grep -q ":9222"; then cnt=${cnt:-0}; cnt=$((cnt+1)); else cnt=0; fi; if [ "${cnt:-0}" -ge 9 ]; then /usr/bin/systemctl --user stop chromium-cdp.service; break; fi; done &'
 Restart=on-failure
 RestartSec=5
 
