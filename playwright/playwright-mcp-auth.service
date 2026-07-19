@@ -1,10 +1,10 @@
 [Unit]
 Description=Playwright MCP auth server (CDP to persistent Chromium)
 After=chromium-cdp.service
-BindsTo=chromium-cdp.service
 
 [Service]
 Type=simple
+ExecStartPre=/usr/bin/systemctl --user start chromium-cdp.service
 ExecStart=npx -y @playwright/mcp@latest --cdp-endpoint=http://127.0.0.1:9222 --port 8932 --host 0.0.0.0 --allowed-hosts '*'
 Restart=on-failure
 RestartSec=5
